@@ -174,7 +174,7 @@
         },
         "mdc.componentMetadataCacheTTL": {
           "type": "number",
-          "default": 30,
+          "default": 360,
           "description": "The number of minutes to cache the MDC metadata. Defaults to 30 minutes."
         },
         "mdc.debug": {
