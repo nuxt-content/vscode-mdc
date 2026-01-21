@@ -25,6 +25,7 @@ Or with Nuxt modules:
 - [Span Text](#span-text)
 - [Attributes](#attributes)
 - [Document folding](#document-folding)
+- [Bracket matching](#bracket-matching)
 - [Formatting](#formatting)
 - [Component name and prop suggestions](#component-name-and-prop-suggestions)
 
@@ -79,6 +80,12 @@ _Italic Text_{#italic_text}
 The extension enables document code folding for MDC block components (and nested components). Simply hover over the gutter of the line you'd like to fold and click on the icon to expand or collapse the range.
 
 ![code folding animation](images/code-folding.gif)
+
+### Bracket matching
+
+The extension automatically highlights matching opening and closing MDC block component tags. When your cursor is positioned on or adjacent to either an opening tag (e.g., `::component-name`) or a closing tag (e.g., `::`), both brackets will be highlighted to help you identify matching pairs in nested components.
+
+This feature is always enabled and works automatically with no configuration required.
 
 ### Formatting
 
