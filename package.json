@@ -223,7 +223,7 @@
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^2.32.0",
     "eslint": "^8.57.1",
-    "esno": "^0.17.0",
+    "esno": "^4.8.0",
     "glob": "^11.0.3",
     "mocha": "^11.7.1",
     "release-it": "^18.1.2",
