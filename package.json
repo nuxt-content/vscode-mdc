@@ -226,7 +226,7 @@
     "esno": "^0.17.0",
     "glob": "^11.0.3",
     "mocha": "^11.7.1",
-    "release-it": "^18.1.2",
+    "release-it": "^19.2.4",
     "typescript": "5.2.2",
     "vscode": "^1.1.37",
     "vscode-textmate": "^9.2.0",
