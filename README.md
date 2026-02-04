@@ -249,6 +249,8 @@ To run the integration tests for this extension:
 2. Build the extension and run tests:
    ```sh
    pnpm test
+   # Or test it manually
+   pnpm test --manual
    ```
 
 This will compile the source and test files, then run the integration tests using VS Code's test runner.
