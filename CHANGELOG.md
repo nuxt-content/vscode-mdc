@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v0.5.0
+
+[compare changes](https://github.com/nuxtlabs/vscode-mdc/compare/v0.4.2...v0.5.0)
+
+### 🚀 Enhancements
+
+- Format on paste ([#80](https://github.com/nuxtlabs/vscode-mdc/pull/80))
+- Mdc block component tag matching and highlighting ([#77](https://github.com/nuxtlabs/vscode-mdc/pull/77))
+
+### 🩹 Fixes
+
+- Component metadata ttl ([#76](https://github.com/nuxtlabs/vscode-mdc/pull/76))
+- Upgrade esno for build ([#79](https://github.com/nuxtlabs/vscode-mdc/pull/79))
+- `while` pattern to match indent in lists ([#81](https://github.com/nuxtlabs/vscode-mdc/pull/81))
+
+### 🏡 Chore
+
+- Upgrade deps and tests ([32be6d6](https://github.com/nuxtlabs/vscode-mdc/commit/32be6d6))
+- Upgrade `@nuxt/schema` ([de71c3a](https://github.com/nuxtlabs/vscode-mdc/commit/de71c3a))
+
+### 🤖 CI
+
+- Upgrade actions ([e492b9e](https://github.com/nuxtlabs/vscode-mdc/commit/e492b9e))
+
+### ❤️ Contributors
+
+- Farnabaz <farnabaz@gmail.com>
+- Adam DeHaven ([@adamdehaven](https://github.com/adamdehaven))
+- Aymkx ([@aymkx](https://github.com/aymkx))
+
 ## v0.4.2
 
 [compare changes](https://github.com/nuxtlabs/vscode-mdc/compare/v0.4.1...v0.4.2)
