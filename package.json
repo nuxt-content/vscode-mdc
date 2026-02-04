@@ -215,7 +215,7 @@
     "publish": "vsce publish"
   },
   "devDependencies": {
-    "@nuxt/schema": "^3.15.4",
+    "@nuxt/schema": "^4.3.0",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.10",
