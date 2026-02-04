@@ -1,5 +1,5 @@
 import * as vscode from 'vscode'
-import { formatter, getDocumentFoldingRanges } from '@nuxtlabs/monarch-mdc'
+import { formatter, getDocumentFoldingRanges, findMatchingBrackets } from '@nuxtlabs/monarch-mdc'
 import { getMdcComponentCompletionItemProvider, getMdcComponentPropCompletionItemProvider, createCacheCleanupListeners } from './completion-providers'
 import { getComponentMetadata } from './component-metadata'
 import { ensureOutputChannel, logger } from './logger'
@@ -10,6 +10,7 @@ let refreshMetadata: vscode.Disposable | null = null
 let formatters: vscode.Disposable[] = []
 let mdcComponentCompletionProvider: vscode.Disposable | null = null
 let mdcComponentPropsCompletionProvider: vscode.Disposable | null = null
+let bracketDecorationType: vscode.TextEditorDecorationType | null = null
 
 /**
  * Formats the entire document using the specified formatter and returns the text edits.
@@ -66,6 +67,54 @@ function provideFoldingRanges (document: vscode.TextDocument): vscode.FoldingRan
   return ranges.map(range =>
     new vscode.FoldingRange(range.start, range.end)
   )
+}
+
+/**
+ * Updates bracket highlighting for the given editor based on cursor position.
+ *
+ * This function finds matching MDC bracket pairs (e.g., "::container" and "::")
+ * and applies decorations to highlight both the opening and closing brackets.
+ *
+ * @param {vscode.TextEditor} editor - The text editor to update bracket highlights for.
+ */
+function updateBracketHighlight (editor: vscode.TextEditor): void {
+  if (!editor || !bracketDecorationType) {
+    return
+  }
+
+  // Only apply bracket matching to MDC files
+  if (editor.document.languageId !== 'mdc') {
+    editor.setDecorations(bracketDecorationType, [])
+    return
+  }
+
+  const position = editor.selection.active
+  const documentAdapter = {
+    getLine: (lineNumber: number) => editor.document.lineAt(lineNumber).text,
+    lineCount: editor.document.lineCount
+  }
+
+  const match = findMatchingBrackets(documentAdapter, {
+    line: position.line,
+    column: position.character
+  })
+
+  if (match) {
+    const openingRange = new vscode.Range(
+      new vscode.Position(match.opening.startLine, match.opening.startColumn),
+      new vscode.Position(match.opening.endLine, match.opening.endColumn)
+    )
+
+    const closingRange = new vscode.Range(
+      new vscode.Position(match.closing.startLine, match.closing.startColumn),
+      new vscode.Position(match.closing.endLine, match.closing.endColumn)
+    )
+
+    editor.setDecorations(bracketDecorationType, [openingRange, closingRange])
+  } else {
+    // Clear decorations if no match
+    editor.setDecorations(bracketDecorationType, [])
+  }
 }
 
 const mdcDocumentSelector: vscode.DocumentSelector = [
@@ -205,6 +254,33 @@ export function activate (context: vscode.ExtensionContext) {
     )
     logger('MDC folding provider registered.')
 
+    logger('Registering MDC bracket matching...')
+    // Create decoration type for matched brackets
+    bracketDecorationType = vscode.window.createTextEditorDecorationType({
+      backgroundColor: new vscode.ThemeColor('editor.wordHighlightBackground'),
+      borderRadius: '3px'
+    })
+
+    // Listen to cursor position changes
+    const selectionChangeDisposable = vscode.window.onDidChangeTextEditorSelection((event) => {
+      updateBracketHighlight(event.textEditor)
+    })
+
+    // Listen to active editor changes
+    const editorChangeDisposable = vscode.window.onDidChangeActiveTextEditor((editor) => {
+      if (editor) {
+        updateBracketHighlight(editor)
+      }
+    })
+
+    // Update on activation for current editor
+    if (vscode.window.activeTextEditor) {
+      updateBracketHighlight(vscode.window.activeTextEditor)
+    }
+
+    context.subscriptions.push(selectionChangeDisposable, editorChangeDisposable, bracketDecorationType)
+    logger('MDC bracket matching registered.')
+
     // Register configuration change listener
     context.subscriptions.push(vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration('mdc')) {
@@ -239,5 +315,9 @@ export function deactivate (): void {
   disposeProviders()
   if (outputChannel) {
     outputChannel.dispose()
+  }
+  if (bracketDecorationType) {
+    bracketDecorationType.dispose()
+    bracketDecorationType = null
   }
 }
