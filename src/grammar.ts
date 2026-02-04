@@ -596,7 +596,7 @@ export const grammar: IRawGrammar = {
               include: 'text.html.markdown#list_paragraph'
             }
           ],
-          while: '((^|\\G)([ ]*|\\t))|(^[ \\t]*$)'
+          while: '((^|\\G)[ \\t]+)|(^[ \\t]*$)'
         },
         {
           begin: '(^|\\G)([ ]*)([0-9]+\\.)([ \\t])',
@@ -614,7 +614,7 @@ export const grammar: IRawGrammar = {
               include: 'text.html.markdown#list_paragraph'
             }
           ],
-          while: '((^|\\G)([ ]*|\\t))|(^[ \\t]*$)'
+          while: '((^|\\G)[ \\t]+)|(^[ \\t]*$)'
         }
       ]
     },

@@ -4,6 +4,7 @@
     "outDir": "out-test",
     "rootDir": "."
   },
+  "exclude": [],
   "include": [
     "test"
   ]

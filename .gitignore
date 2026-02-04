@@ -5,6 +5,7 @@ node_modules
 *.vsix
 .vscode-test-web
 .env
+.local
 
 # OSX files
 .DS_Store
