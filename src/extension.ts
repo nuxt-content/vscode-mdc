@@ -118,6 +118,10 @@ export function activate (context: vscode.ExtensionContext) {
           vscode.languages.registerDocumentFormattingEditProvider(mdcDocumentSelector, {
             provideDocumentFormattingEdits: (document: vscode.TextDocument) => getDocumentFormatter(document, false)
           }),
+          // Register the document format on paste provider
+          vscode.languages.registerDocumentRangeFormattingEditProvider(mdcDocumentSelector, {
+            provideDocumentRangeFormattingEdits: (document: vscode.TextDocument) => getDocumentFormatter(document, false)
+          }),
           // Register the format on type provider
           vscode.languages.registerOnTypeFormattingEditProvider(
             mdcDocumentSelector,
