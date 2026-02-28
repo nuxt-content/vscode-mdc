@@ -1,6 +1,6 @@
 {
   "name": "mdc",
-  "packageManager": "pnpm@10.28.2",
+  "packageManager": "pnpm@10.30.3",
   "displayName": "MDC - Markdown Components",
   "description": "Provides syntax highlighting and colon matching for MDC (Markdown Components) files for Nuxt Content.",
   "version": "0.5.0",
@@ -13,7 +13,7 @@
   "homepage": "https://github.com/nuxtlabs/vscode-mdc/blob/main/README.md",
   "license": "MIT",
   "engines": {
-    "vscode": "^1.75.0"
+    "vscode": "^1.109.5"
   },
   "categories": [
     "Programming Languages",
@@ -215,23 +215,23 @@
     "publish": "vsce publish"
   },
   "devDependencies": {
-    "@nuxt/schema": "^4.3.0",
+    "@nuxt/schema": "^4.3.1",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^25.2.0",
+    "@types/node": "^25.3.3",
     "@types/vscode": "1.42.0",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^2.32.0",
     "eslint": "^8.57.1",
     "esno": "^4.8.0",
-    "glob": "^11.0.3",
+    "glob": "^11.1.0",
     "mocha": "^11.7.5",
     "release-it": "^19.2.4",
     "typescript": "5.9.3",
     "vscode": "^1.1.37",
     "vscode-textmate": "^9.3.2",
-    "vue-component-meta": "^3.2.4"
+    "vue-component-meta": "^3.2.5"
   },
   "dependencies": {
     "@nuxtlabs/monarch-mdc": "^0.9.0",
