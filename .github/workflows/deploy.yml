@@ -17,7 +17,7 @@ jobs:
           node-version: lts/*
 
       - name: pnpm setup
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
 
       - run: pnpm install
 
