@@ -228,7 +228,7 @@
     "glob": "^11.0.3",
     "mocha": "^11.7.5",
     "release-it": "^19.2.4",
-    "typescript": "5.9.3",
+    "typescript": "6.0.2",
     "vscode": "^1.1.37",
     "vscode-textmate": "^9.3.2",
     "vue-component-meta": "^3.2.4"
