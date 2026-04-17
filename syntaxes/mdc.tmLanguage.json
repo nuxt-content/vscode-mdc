@@ -1,6 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "mdc",
+  "aliases": ["comark"],
   "injectionSelector": "L:text.html.markdown",
   "scopeName": "text.markdown.mdc",
   "patterns": [
@@ -53,6 +54,9 @@
         },
         {
           "include": "#attributes"
+        },
+        {
+          "include": "text.html.markdown#inline"
         }
       ]
     },
@@ -79,7 +83,7 @@
       }
     },
     "attributes": {
-      "match": "(?x)(               # attributes\n    ({)\n      ([^{]*)\n    (})\n  )",
+      "match": "(?x)(               # attributes\n    ({)\n      ((?:[^{}'\"]+|'[^']*'|\"[^\"]*\")*)\n    (})\n  )",
       "name": "attributes.mdc",
       "captures": {
         "1": {
@@ -98,7 +102,7 @@
       }
     },
     "component_inline": {
-      "match": "(?x)\n  (^|\\G|\\s+)\n  (:)              # component colon\n  (?i:             # component name\n    (\\w[\\w\\d-]*)\n  )\n  (\n      ({[^}]*})        # attributes\n      (\\[[^\\]]*\\])? # slot\n      # reverse order\n    | (\\[[^\\]]*\\])  # slot\n      ({[^}]*})?       # attributes\n  )?\n  \\s",
+      "match": "(?x)\n  (^|\\G|\\s+)\n  (:)              # component colon\n  (?i:             # component name\n    (\\w[\\w\\d-]*)\n  )\n  (\n      (\\{(?:[^{}'\"]+|'[^']*'|\"[^\"]*\")*\\}) # attributes\n      (\\[[^\\]]*\\])?                          # slot\n    | (\\[[^\\]]*\\])                           # slot\n      (\\{(?:[^{}'\"]+|'[^']*'|\"[^\"]*\")*\\})? # attributes\n  )?\n  \\s",
       "name": "inline.component.mdc",
       "captures": {
         "2": {
@@ -138,7 +142,7 @@
       }
     },
     "component_block": {
-      "begin": "(?x)\n  (^|\\G)(\\s*)\n  (:{2,})     # component colons\n  (?i:\n    (\\w[\\w\\d-]+)   # component name\n    (                 # folowing spaces or attributes\n        \\s*\n      | \\s*({[^{]*})\n    )\n    $\n  )",
+      "begin": "(?x)\n  (^|\\G)(\\s*)\n  (:{2,})     # component colons\n  (?i:\n    (\\w[\\w\\d-]+)   # component name\n    (                 # folowing spaces or attributes\n        \\s*\n      | \\s*(\\{(?:[^{}'\"]+|'[^']*'|\"[^\"]*\")*\\})\n    )\n    $\n  )",
       "name": "block.component.mdc",
       "end": "(^|\\G)(\\2)(\\3)\\s*$",
       "beginCaptures": {
@@ -531,7 +535,7 @@
       "name": "meta.paragraph.markdown",
       "patterns": [
         {
-          "include": "text.html.markdown#inline"
+          "include": "#inline"
         },
         {
           "include": "text.html.derivative"
