@@ -1,6 +1,6 @@
 # Hello
 
-_Hello_ **World** from [`vscode-mdc`](https://github.com/nuxtlabs/vscode-mdc)
+_Hello_ **World** from [`vscode-comark`](https://github.com/comarkdown/vscode-comark)
 
 > This file contains the basic Markdown Components syntax
 
@@ -65,4 +65,3 @@ const md = new MarkdownIt()
     background-color: #ff0000;
   }
 </style>
-

@@ -1,4 +1,4 @@
-<img src="./images/icon.png" alt="MDC - Markdown Components by NuxtLabs" width="150" />
+<img src="./images/logo.png" alt="Comark - Components in Markdow VS Code Extension" width="150" />
 
 # MDC syntax highlight for Visual Studio Code
 

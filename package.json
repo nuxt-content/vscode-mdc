@@ -1,16 +1,16 @@
 {
   "name": "mdc",
   "packageManager": "pnpm@10.28.2",
-  "displayName": "MDC - Markdown Components",
-  "description": "Provides syntax highlighting and colon matching for MDC (Markdown Components) files for Nuxt Content.",
+  "displayName": "Comark - Components in Markdown (previously MDC)",
+  "description": "Provides syntax highlighting and colon matching for Comark (Components in Markdown, previously MDC) files.",
   "version": "0.5.0",
   "publisher": "Nuxt",
-  "icon": "images/icon.png",
+  "icon": "images/logo.png",
   "repository": {
-    "url": "https://github.com/nuxtlabs/vscode-mdc",
+    "url": "https://github.com/comarkdown/vscode-comark",
     "type": "git"
   },
-  "homepage": "https://github.com/nuxtlabs/vscode-mdc/blob/main/README.md",
+  "homepage": "https://github.com/comarkdown/vscode-comark/blob/main/README.md",
   "license": "MIT",
   "engines": {
     "vscode": "^1.75.0"
@@ -31,15 +31,16 @@
           "mdc",
           "Nuxt Content",
           "Nuxt MDC",
-          "Nuxt Markdown Components"
+          "Nuxt Markdown Components",
+          "Comark"
         ],
         "filenamePatterns": [
           "*.md",
           "*.mdc"
         ],
         "icon": {
-          "dark": "./images/mdc.png",
-          "light": "./images/mdc.png"
+          "dark": "./images/icon-dark.png",
+          "light": "./images/icon-light.png"
         },
         "configuration": "./language-configuration.json",
         "extensions": [
