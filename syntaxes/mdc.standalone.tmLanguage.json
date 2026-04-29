@@ -51,6 +51,9 @@
     "inline": {
       "patterns": [
         {
+          "include": "#binding"
+        },
+        {
           "include": "#component_inline"
         },
         {
@@ -63,6 +66,28 @@
           "include": "text.html.markdown#inline"
         }
       ]
+    },
+    "binding": {
+      "match":
+        "(?x)\n  (\\{\\{)                       # opening braces\n  \\s*\n  ((?:[^|}]|\\|(?!\\|))+?)       # variable / dot-path\n  \\s*\n  (?:\n    (\\|\\|)                     # default operator\n    \\s*\n    ([^}]+?)                     # default value\n    \\s*\n  )?\n  (\\}\\})                        # closing braces",
+      "name": "meta.binding.mdc",
+      "captures": {
+        "1": {
+          "name": "punctuation.section.embedded.begin.mdc"
+        },
+        "2": {
+          "name": "variable.other.mdc"
+        },
+        "3": {
+          "name": "keyword.operator.logical.mdc"
+        },
+        "4": {
+          "name": "string.unquoted.mdc"
+        },
+        "5": {
+          "name": "punctuation.section.embedded.end.mdc"
+        }
+      }
     },
     "span": {
       "match": "(?x)\n  (\\[)           # Open\n    ([^]]*)\n  (\\])\n  (               # attributes\n    ({)\n      ([^{]*)\n    (})\n  )?\n  \\s",
