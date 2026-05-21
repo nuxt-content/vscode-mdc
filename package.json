@@ -1,6 +1,6 @@
 {
   "name": "mdc",
-  "packageManager": "pnpm@10.33.2",
+  "packageManager": "pnpm@11.2.2",
   "displayName": "Comark - Components in Markdown (previously MDC)",
   "description": "Provides syntax highlighting and colon matching for Comark (Components in Markdown, previously MDC) files.",
   "version": "0.6.0",
