@@ -1,7 +1,9 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
   "name": "mdc",
-  "aliases": ["comark"],
+  "aliases": [
+    "comark"
+  ],
   "displayName": "MDC - Components in Markdown",
   "injectionSelector": "L:text.html.markdown",
   "scopeName": "text.markdown.mdc.standalone",
@@ -68,8 +70,7 @@
       ]
     },
     "binding": {
-      "match":
-        "(?x)\n  (\\{\\{)                       # opening braces\n  \\s*\n  ((?:[^|}]|\\|(?!\\|))+?)       # variable / dot-path\n  \\s*\n  (?:\n    (\\|\\|)                     # default operator\n    \\s*\n    ([^}]+?)                     # default value\n    \\s*\n  )?\n  (\\}\\})                        # closing braces",
+      "match": "(?x)\n  (\\{\\{)                       # opening braces\n  \\s*\n  ((?:[^|}]|\\|(?!\\|))+?)       # variable / dot-path\n  \\s*\n  (?:\n    (\\|\\|)                     # default operator\n    \\s*\n    ([^}]+?)                     # default value\n    \\s*\n  )?\n  (\\}\\})                        # closing braces",
       "name": "meta.binding.mdc",
       "captures": {
         "1": {

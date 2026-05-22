@@ -58,6 +58,9 @@ export const grammar: IRawGrammar = {
     inline: {
       patterns: [
         {
+          include: '#binding'
+        },
+        {
           include: '#component_inline'
         },
         {
@@ -65,8 +68,43 @@ export const grammar: IRawGrammar = {
         },
         {
           include: '#attributes'
+        },
+        {
+          include: 'text.html.markdown#inline'
         }
       ]
+    },
+    binding: {
+      match: `(?x)
+  (\\{\\{)                       # opening braces
+  \\s*
+  ((?:[^|}]|\\|(?!\\|))+?)       # variable / dot-path
+  \\s*
+  (?:
+    (\\|\\|)                     # default operator
+    \\s*
+    ([^}]+?)                     # default value
+    \\s*
+  )?
+  (\\}\\})                        # closing braces`,
+      name: 'meta.binding.mdc',
+      captures: {
+        1: {
+          name: 'punctuation.section.embedded.begin.mdc'
+        },
+        2: {
+          name: 'variable.other.mdc'
+        },
+        3: {
+          name: 'keyword.operator.logical.mdc'
+        },
+        4: {
+          name: 'string.unquoted.mdc'
+        },
+        5: {
+          name: 'punctuation.section.embedded.end.mdc'
+        }
+      }
     },
     span: {
       match: `(?x)
@@ -102,7 +140,7 @@ export const grammar: IRawGrammar = {
     attributes: {
       match: `(?x)(               # attributes
     ({)
-      ([^{]*)
+      ((?:[^{}'"]+|'[^']*'|"[^"]*")*)
     (})
   )`,
       name: 'attributes.mdc',
@@ -130,11 +168,10 @@ export const grammar: IRawGrammar = {
     (\\w[\\w\\d-]*)
   )
   (
-      ({[^}]*})        # attributes
-      (\\[[^\\]]*\\])? # slot
-      # reverse order
-    | (\\[[^\\]]*\\])  # slot
-      ({[^}]*})?       # attributes
+      (\\{(?:[^{}'"]+|'[^']*'|"[^"]*")*\\}) # attributes
+      (\\[[^\\]]*\\])?                          # slot
+    | (\\[[^\\]]*\\])                           # slot
+      (\\{(?:[^{}'"]+|'[^']*'|"[^"]*")*\\})? # attributes
   )?
   \\s`,
       name: 'inline.component.mdc',
@@ -183,7 +220,7 @@ export const grammar: IRawGrammar = {
     (\\w[\\w\\d-]+)   # component name
     (                 # folowing spaces or attributes
         \\s*
-      | \\s*({[^{]*})
+      | \\s*(\\{(?:[^{}'"]+|'[^']*'|"[^"]*")*\\})
     )
     $
   )`,
@@ -623,7 +660,7 @@ export const grammar: IRawGrammar = {
       name: 'meta.paragraph.markdown',
       patterns: [
         {
-          include: 'text.html.markdown#inline'
+          include: '#inline'
         },
         {
           include: 'text.html.derivative'
