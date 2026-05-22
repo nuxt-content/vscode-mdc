@@ -3,8 +3,8 @@
 # Comark & MDC syntax highlight for Visual Studio Code
 
 [![MDC Extension for VS Code][extension-version-src]][extension-href]
-[![MDC Extension for VS Code][extension-downloads-src]][extension-href]
 [![MDC Extension for VS Code][extension-installs-src]][extension-href]
+[![MDC Extension for VS Code][extension-ratings-src]][extension-href]
 
 Provides syntax highlighting and colon (`:`) matching for MDC (Markdown Components) files, as well as document folding and format providers, along with component name and prop suggestions.
 
@@ -259,6 +259,6 @@ This will compile the source and test files, then run the integration tests usin
 
 <!-- Badges -->
 [extension-href]: https://marketplace.visualstudio.com/items?itemName=Nuxt.mdc
-[extension-version-src]: https://img.shields.io/visual-studio-marketplace/v/Nuxt.mdc?label=Visual%20Studio%20Code&style=flat&colorA=020420&colorB=28CF8D
-[extension-downloads-src]: https://img.shields.io/visual-studio-marketplace/d/Nuxt.mdc?style=flat&colorA=020420&colorB=28CF8D
-[extension-installs-src]: https://img.shields.io/visual-studio-marketplace/i/Nuxt.mdc?style=flat&colorA=020420&colorB=28CF8D
+[extension-version-src]: https://vsmarketplacebadges.dev/version/Nuxt.mdc.svg?label=Visual%20Studio%20Code&style=flat&colorA=020420&colorB=28CF8D
+[extension-installs-src]: https://vsmarketplacebadges.dev/installs-short/Nuxt.mdc.svg?style=flat&colorA=020420&colorB=28CF8D
+[extension-ratings-src]: https://vsmarketplacebadges.dev/rating-short/Nuxt.mdc.svg?style=flat&colorA=020420&colorB=28CF8D
