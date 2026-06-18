@@ -487,6 +487,37 @@ function getCurrentYAMLBlockProps (document: vscode.TextDocument, lineNumber: nu
 }
 
 /**
+ * Computes the VS Code completion replacement range for a kebab-case name token.
+ *
+ * `getWordRangeAtPosition` treats `-` as a word separator and returns only the segment
+ * after the last hyphen, which breaks fuzzy filtering (VS Code sees too narrow a prefix)
+ * and replacement (only the last segment is overwritten, leaving a prefix on the line).
+ * This anchors the range start after the given leading prefix and extends the end through
+ * any trailing `[a-zA-Z-]` characters past the cursor for correct mid-word behavior.
+ *
+ * @param lineContent - Full text of the current line
+ * @param position - Current cursor position
+ * @param prefixPattern - Regex matching the leading characters to exclude from the range (e.g. colons, whitespace)
+ * @returns `vscode.Range` suitable for a `CompletionItem.range`
+ */
+function getKebabNameRange (
+  lineContent: string,
+  position: vscode.Position,
+  prefixPattern: RegExp,
+): vscode.Range {
+  const prefixMatch = lineContent.match(prefixPattern)
+  const startChar = prefixMatch ? prefixMatch[0].length : 0
+  let endChar = position.character
+  while (endChar < lineContent.length && /[a-zA-Z-]/.test(lineContent[endChar])) {
+    endChar++
+  }
+  return new vscode.Range(
+    new vscode.Position(position.line, startChar),
+    new vscode.Position(position.line, endChar),
+  )
+}
+
+/**
  * Generate the VS Code completion item provider for MDC components.
  *
  * @param {MDCComponentData[]} componentData - The MDC component data
@@ -521,21 +552,25 @@ export function getMdcComponentCompletionItemProvider (componentData: MDCCompone
   // Ensure there is always a minimum of 2 colons
   const blockSeparator = ':'.repeat(Math.max(2, colonCharacterCount))
 
+  // If the line immediately below is already a YAML block opener, the full block scaffold
+  // (props + slot + closing ::) is already present — only replace the component name.
+  const hasExistingBlock = position.line + 1 < document.lineCount
+    && document.lineAt(position.line + 1).text.trim() === '---'
+
   function getMdcComponentInsertText ({ name, contentPlaceholder = '' }: {
     /** The MDC component name */
     name: string
     contentPlaceholder?: string
   }) {
     const componentName = kebabCase(name)
+    const prefix = colonCharacterCount === 1 ? ':' : ''
+    if (hasExistingBlock) {
+      return `${prefix}${componentName}`
+    }
     const propsPlaceholder = '\n---${1:}\n---'
-
-    // If the colon character count is 1, add a colon before the component name to make it a block component
-    return `${colonCharacterCount === 1 ? ':' : ''}${componentName}${propsPlaceholder}${contentPlaceholder}\n${blockSeparator}\n`
+    return `${prefix}${componentName}${propsPlaceholder}${contentPlaceholder}\n${blockSeparator}\n`
   }
 
-  // Get the word at current position
-  const wordRange = document.getWordRangeAtPosition(position)
-  // const wordInfo = wordRange ? document.getText(wordRange) : ''
   // Create a Map to store unique suggestions
   const uniqueSuggestions = new Map<string, vscode.CompletionItem>()
 
@@ -548,7 +583,7 @@ export function getMdcComponentCompletionItemProvider (componentData: MDCCompone
       uniqueSuggestions.set(component.mdc_name, {
         label: component.mdc_name,
         kind: vscode.CompletionItemKind.Function,
-        range: wordRange,
+        range: getKebabNameRange(lineContent, position, /^\s*:+/),
         insertText: new vscode.SnippetString(getMdcComponentInsertText({
           name: component.mdc_name,
           // Conditionally render the default slot content placeholder if the component has slots
@@ -558,7 +593,8 @@ export function getMdcComponentCompletionItemProvider (componentData: MDCCompone
         documentation: documentationMarkdown
           ? new vscode.MarkdownString(documentationMarkdown)
           : undefined,
-        command: {
+        // Skip formatting when renaming an existing block — no structural change was made.
+        command: hasExistingBlock ? undefined : {
           command: 'editor.action.formatDocument',
           title: 'Format Document'
         }
@@ -615,9 +651,6 @@ export function getMdcComponentPropCompletionItemProvider (componentData: MDCCom
   const docsMarkdownLink = getComponentDocsLink(mdcComponent)
   if (!mdcComponent?.component_meta?.meta?.props) { return }
 
-  // Get the word at current position
-  const wordRange = document.getWordRangeAtPosition(position)
-  // const wordInfo = wordRange ? document.getText(wordRange) : ''
   const suggestionsByComponent = new Map<string, vscode.CompletionItem[]>()
   suggestionsByComponent.set(currentMdcBlockName, [])
 
@@ -685,7 +718,7 @@ export function getMdcComponentPropCompletionItemProvider (componentData: MDCCom
       filterText: `${propNameKebab} ${propNameCamel}`,
       sortText: prop.required ? '_' + propNameKebab : propNameKebab, // Force "required" props to the top
       kind: vscode.CompletionItemKind.Property,
-      range: wordRange,
+      range: getKebabNameRange(lineContent, position, /^\s*/),
       insertText: new vscode.SnippetString(getPropInsertText(propNameKebab, propValueType)), // Always insert kebab-case
       detail: prop.description, // Shows up in the details section of the completion item
       documentation: new vscode.MarkdownString(docsMarkdownLink),
