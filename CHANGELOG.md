@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## v0.6.2
+
+[compare changes](https://github.com/comarkdown/vscode-comark/compare/v0.6.1...v0.6.2)
+
+### 🩹 Fixes
+
+- Unify grammar source so build regenerates both tmLanguage variants ([#93](https://github.com/comarkdown/vscode-comark/pull/93))
+- Mdc component completions ([#94](https://github.com/comarkdown/vscode-comark/pull/94))
+
+### 🏡 Chore
+
+- Fix badges in readme ([#92](https://github.com/comarkdown/vscode-comark/pull/92))
+- Upgrade deps ([6100339](https://github.com/comarkdown/vscode-comark/commit/6100339))
+
+### ❤️ Contributors
+
+- Farnabaz <farnabaz@gmail.com>
+- Adam DeHaven ([@adamdehaven](https://github.com/adamdehaven))
+- Sébastien Chopin ([@atinux](https://github.com/atinux))
+
 ## v0.6.1
 
 [compare changes](https://github.com/comarkdown/vscode-comark/compare/v0.6.0...v0.6.1)
