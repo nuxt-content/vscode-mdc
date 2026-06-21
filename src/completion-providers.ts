@@ -4,6 +4,7 @@ import * as vscode from 'vscode'
 import type { ComponentMeta } from 'vue-component-meta'
 import type { Component } from '@nuxt/schema'
 import { logger } from './logger'
+import { isInsideYAMLBlock, isInsideCodeBlock } from './utils/document'
 
 type MDCComponentMeta = Omit<Component, 'filePath' | 'shortPath'> & {
   meta: ComponentMeta
@@ -202,58 +203,6 @@ function isInsideMDCComponent (document: vscode.TextDocument, lineNumber: number
 
   // If stack has any components, we're inside at least one MDC component
   return componentStack.length > 0
-}
-
-/**
- * Determines if the current position is inside a YAML block.
- *
- * @param {vscode.TextDocument} document - The VS Code text document.
- * @param {number} lineNumber - The 1-based line number of the current cursor position.
- * @returns {boolean} - True if inside a YAML block, false otherwise.
- */
-function isInsideYAMLBlock (document: vscode.TextDocument, lineNumber: number): boolean {
-  const lines = getModelLines(document)
-  let insideYAMLBlock = false
-
-  for (let i = 0; i < lineNumber; i++) {
-    const line = lines?.[i]?.trim()
-    if (!line) {
-      continue
-    }
-    // Toggle insideYAMLBlock flag when encountering YAML block delimiters (---)
-    if (/^\s*---\s*$/.test(line)) {
-      insideYAMLBlock = !insideYAMLBlock
-    }
-  }
-
-  // Return true if inside a YAML block
-  return insideYAMLBlock
-}
-
-/**
- * Determines if the current position is inside a markdown code block.
- *
- * @param {vscode.TextDocument} document - The VS Code text document.
- * @param {number} lineNumber - The 1-based line number of the current cursor position.
- * @returns {boolean} - True if inside a markdown code block, false otherwise.
- */
-function isInsideCodeBlock (document: vscode.TextDocument, lineNumber: number): boolean {
-  const lines = getModelLines(document)
-  let insideCodeBlock = false
-
-  for (let i = 0; i < lineNumber; i++) {
-    const line = lines?.[i]?.trim()
-    if (!line) {
-      continue
-    }
-    // Toggle insideCodeBlock flag when encountering a code block delimiter (``` or ~~~)
-    if (/^\s*(?:`{3,}|~{3,})/.test(line)) {
-      insideCodeBlock = !insideCodeBlock
-    }
-  }
-
-  // Return true if inside a markdown code block
-  return insideCodeBlock
 }
 
 /**

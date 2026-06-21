@@ -2,10 +2,13 @@ import { kebabCase, pascalCase } from 'scule'
 import * as vscode from 'vscode'
 import type { MDCComponentData } from './completion-providers'
 import { logger } from './logger'
+import { isInsideYAMLBlock, isInsideCodeBlock } from './utils/document'
+import { extractSlotsFromVue, extractSlotsFromSvelte, extractSlotsFromReact, extractSlotsFromAngular } from './utils/slot-extractors'
 
 /** Regex to match block component opening lines */
 const MDC_COMPONENT_START_REGEX = /^\s*:{2,}([\w-]+)/
-/** Regex to match slot declarations */
+/** Regex to match block component closing lines (2+ colons with no name) */
+const MDC_COMPONENT_END_REGEX = /^\s*:{2,}\s*$/
 const SLOT_PATTERN = /^\s*#([\w-]+)/
 
 /** Cache for component file slot discovery results (keyed by component name) */
@@ -43,46 +46,12 @@ export function getEnclosingComponent (document: vscode.TextDocument, lineNumber
       continue
     }
 
-    if (line === '::') {
+    if (MDC_COMPONENT_END_REGEX.test(line)) {
       componentStack.pop()
     }
   }
 
   return componentStack[componentStack.length - 1]
-}
-
-/**
- * Checks if the cursor is inside a YAML block (between `---` delimiters).
- *
- * @param {vscode.TextDocument} document - The VS Code text document
- * @param {number} lineNumber - The 0-based line number of the current cursor position
- * @returns {boolean} - True if inside a YAML block, false otherwise
- */
-export function isInsideYAMLBlock (document: vscode.TextDocument, lineNumber: number): boolean {
-  let inside = false
-  for (let i = 0; i < lineNumber; i++) {
-    if (/^\s*---\s*$/.test(document.lineAt(i).text)) {
-      inside = !inside
-    }
-  }
-  return inside
-}
-
-/**
- * Checks if the cursor is inside a fenced code block.
- *
- * @param {vscode.TextDocument} document - The VS Code text document
- * @param {number} lineNumber - The 0-based line number of the current cursor position
- * @returns {boolean} - True if inside a code block, false otherwise
- */
-export function isInsideCodeBlock (document: vscode.TextDocument, lineNumber: number): boolean {
-  let inside = false
-  for (let i = 0; i < lineNumber; i++) {
-    if (/^\s*(?:`{3,}|~{3,})/.test(document.lineAt(i).text.trim())) {
-      inside = !inside
-    }
-  }
-  return inside
 }
 
 /**
@@ -100,7 +69,7 @@ export function getExistingSlotNames (document: vscode.TextDocument, lineNumber:
     const line = document.lineAt(i).text.trim()
     if (MDC_COMPONENT_START_REGEX.test(line)) {
       stack.push(i)
-    } else if (line === '::') {
+    } else if (MDC_COMPONENT_END_REGEX.test(line)) {
       stack.pop()
     }
   }
@@ -139,7 +108,7 @@ export function discoverSlotsFromDocument (document: vscode.TextDocument, compon
       continue
     }
 
-    if (line === '::') {
+    if (MDC_COMPONENT_END_REGEX.test(line)) {
       componentStack.pop()
       continue
     }
@@ -155,126 +124,6 @@ export function discoverSlotsFromDocument (document: vscode.TextDocument, compon
   }
 
   return Array.from(discoveredSlots)
-}
-
-/**
- * Extracts slot names from a Vue SFC (.vue) by looking for:
- * - defineSlots<{ slotName(): any }>()
- * - <slot name="slotName" />
- */
-export function extractSlotsFromVue (content: string): string[] {
-  const slots = new Set<string>()
-
-  // defineSlots<{ name(): any }>
-  const defineSlotsMatch = content.match(/defineSlots\s*<\s*\{([^}]*)\}\s*>/s)
-  if (defineSlotsMatch) {
-    const body = defineSlotsMatch[1]
-    const re = /(\w+)\s*\(/g
-    let m
-    while ((m = re.exec(body)) !== null) {
-      slots.add(m[1])
-    }
-  }
-
-  // <slot name="xxx">
-  const slotTagRe = /<slot\s+(?:[^>]*\s)?name="([\w-]+)"/g
-  let m
-  while ((m = slotTagRe.exec(content)) !== null) {
-    slots.add(m[1])
-  }
-
-  return Array.from(slots)
-}
-
-/**
- * Extracts slot names from a Svelte component (.svelte) by looking for:
- * - <slot name="slotName" />
- * - <slot /> (default)
- * - {#snippet slotName()} (Svelte 5 snippets)
- */
-export function extractSlotsFromSvelte (content: string): string[] {
-  const slots = new Set<string>()
-
-  // <slot name="xxx">
-  const namedSlotRe = /<slot\s+(?:[^>]*\s)?name="([\w-]+)"/g
-  let m
-  while ((m = namedSlotRe.exec(content)) !== null) {
-    slots.add(m[1])
-  }
-
-  // <slot /> or <slot> (no name attr = default)
-  const defaultSlotRe = /<slot\s*\/?>/g
-  if (defaultSlotRe.test(content)) {
-    slots.add('default')
-  }
-
-  // Svelte 5 snippet props: {#snippet slotName()}
-  const snippetRe = /\{#snippet\s+(\w+)\s*\(/g
-  while ((m = snippetRe.exec(content)) !== null) {
-    slots.add(m[1])
-  }
-
-  return Array.from(slots)
-}
-
-/**
- * Extracts slot names from a React/TSX component (.tsx/.jsx) by looking for:
- * - Props interface/type with ReactNode/React.ReactNode typed properties
- * - `props.children` usage (maps to default slot)
- */
-export function extractSlotsFromReact (content: string): string[] {
-  const slots = new Set<string>()
-
-  // Match properties typed as ReactNode in interfaces/types
-  // e.g. header?: ReactNode, footer: React.ReactNode
-  const reactNodeRe = /^\s*(\w+)\s*[?]?\s*:\s*(?:React\.)?ReactNode/gm
-  let m
-  while ((m = reactNodeRe.exec(content)) !== null) {
-    const name = m[1]
-    if (name === 'children') {
-      slots.add('default')
-    } else {
-      slots.add(kebabCase(name))
-    }
-  }
-
-  // Check for props.children usage
-  if (/props\.children|\{\s*children\s*\}/.test(content)) {
-    slots.add('default')
-  }
-
-  return Array.from(slots)
-}
-
-/**
- * Extracts slot names from an Angular component (.ts with inline template or .html) by looking for:
- * - `<ng-content select="[slotName]" />` (attribute selector → slot name)
- * - `<ng-content select=".slotName" />` (class selector → slot name)
- * - `<ng-content />` or `<ng-content>` (no select → default slot)
- */
-export function extractSlotsFromAngular (content: string): string[] {
-  const slots = new Set<string>()
-
-  // <ng-content select="[slotName]"> — attribute selector
-  const attrSelectRe = /<ng-content\s+[^>]*select="[^"]*\[(\w[\w-]*)\][^"]*"/g
-  let m
-  while ((m = attrSelectRe.exec(content)) !== null) {
-    slots.add(kebabCase(m[1]))
-  }
-
-  // <ng-content select=".slotName"> — class selector
-  const classSelectRe = /<ng-content\s+[^>]*select="[^"]*\.([\w-]+)[^"]*"/g
-  while ((m = classSelectRe.exec(content)) !== null) {
-    slots.add(kebabCase(m[1]))
-  }
-
-  // <ng-content> or <ng-content /> with no select attribute — default slot
-  const defaultRe = /<ng-content\s*\/?>/g
-  if (defaultRe.test(content)) {
-    slots.add('default')
-  }
-
-  return Array.from(slots)
 }
 
 /**
