@@ -2,6 +2,7 @@ import * as vscode from 'vscode'
 import { formatter, getDocumentFoldingRanges, findMatchingBrackets } from '@nuxtlabs/monarch-mdc'
 import { getMdcComponentCompletionItemProvider, getMdcComponentPropCompletionItemProvider, createCacheCleanupListeners } from './completion-providers'
 import { getComponentMetadata } from './component-metadata'
+import { getMdcSlotCompletionProvider, invalidateSlotCache } from './slot-completion-provider'
 import { ensureOutputChannel, logger } from './logger'
 
 let outputChannel: vscode.OutputChannel | null = null
@@ -10,6 +11,7 @@ let refreshMetadata: vscode.Disposable | null = null
 let formatters: vscode.Disposable[] = []
 let mdcComponentCompletionProvider: vscode.Disposable | null = null
 let mdcComponentPropsCompletionProvider: vscode.Disposable | null = null
+let mdcSlotCompletionProvider: vscode.Disposable | null = null
 let bracketDecorationType: vscode.TextEditorDecorationType | null = null
 
 /**
@@ -150,6 +152,9 @@ export function activate (context: vscode.ExtensionContext) {
       if (mdcComponentPropsCompletionProvider) {
         mdcComponentPropsCompletionProvider.dispose()
       }
+      if (mdcSlotCompletionProvider) {
+        mdcSlotCompletionProvider.dispose()
+      }
 
       // Dispose existing formatters
       formatters.forEach(f => f.dispose())
@@ -187,6 +192,13 @@ export function activate (context: vscode.ExtensionContext) {
         // Add cache cleanup listeners
         context.subscriptions.push(createCacheCleanupListeners())
 
+        // Invalidate slot cache when component source files change
+        const componentWatcher = vscode.workspace.createFileSystemWatcher('**/*.{vue,svelte,tsx,jsx}')
+        componentWatcher.onDidChange(() => invalidateSlotCache())
+        componentWatcher.onDidCreate(() => invalidateSlotCache())
+        componentWatcher.onDidDelete(() => invalidateSlotCache())
+        context.subscriptions.push(componentWatcher)
+
         // Initialize component name and prop completion providers
         getComponentMetadata(true).then(() => {
           logger('Initial MDC component metadata fetch completed.')
@@ -219,10 +231,26 @@ export function activate (context: vscode.ExtensionContext) {
           ' ' // Trigger on space character
           )
 
+          // Dispose and re-register slot completion provider with metadata
+          if (mdcSlotCompletionProvider) {
+            mdcSlotCompletionProvider.dispose()
+          }
+          mdcSlotCompletionProvider = vscode.languages.registerCompletionItemProvider(
+            mdcDocumentSelector,
+            {
+              async provideCompletionItems (document, position, token, context) {
+                const mdcComponents = await getComponentMetadata()
+                return getMdcSlotCompletionProvider(mdcComponents || undefined).provideCompletionItems(document, position, token, context)
+              }
+            },
+            '#' // Trigger on hash
+          )
+
           // Add to subscriptions for cleanup on deactivate
           context.subscriptions.push(
             mdcComponentCompletionProvider,
-            mdcComponentPropsCompletionProvider
+            mdcComponentPropsCompletionProvider,
+            mdcSlotCompletionProvider
           )
 
           // Dispose component metadata refresh command
@@ -244,6 +272,17 @@ export function activate (context: vscode.ExtensionContext) {
           throw error // Re-throw to ensure VS Code knows the action failed
         })
       }
+
+      // Always register slot completion provider (discovers slots from document when no metadata)
+      if (!mdcSlotCompletionProvider) {
+        mdcSlotCompletionProvider = vscode.languages.registerCompletionItemProvider(
+          mdcDocumentSelector,
+          getMdcSlotCompletionProvider(),
+          '#' // Trigger on hash
+        )
+        context.subscriptions.push(mdcSlotCompletionProvider)
+      }
+
     }
 
     logger('Registering MDC folding provider...')
@@ -308,6 +347,10 @@ function disposeProviders () {
   if (mdcComponentPropsCompletionProvider) {
     mdcComponentPropsCompletionProvider.dispose()
     mdcComponentPropsCompletionProvider = null
+  }
+  if (mdcSlotCompletionProvider) {
+    mdcSlotCompletionProvider.dispose()
+    mdcSlotCompletionProvider = null
   }
 }
 

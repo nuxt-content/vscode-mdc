@@ -30,6 +30,7 @@ Or with Nuxt modules:
 - [Bracket matching](#bracket-matching)
 - [Formatting](#formatting)
 - [Component name and prop suggestions](#component-name-and-prop-suggestions)
+- [Slot completions](#slot-completions)
 
 ### Block Components
 
@@ -235,6 +236,20 @@ The endpoint provided to `mdc.componentMetadataURL` should return JSON data in o
 ```
 
 The extension caches component metadata based on the the configurable TTL and provides a command `MDC: Refresh component metadata` to manually update the cache. To customize the cache TTL you may customize the value for `mdc.componentMetadataCacheTTL` in settings. Defaults to `30` minutes.
+
+### Slot completions
+
+The extension provides auto-completion for slot names (`#slotName`) inside block components. When you type `#` inside a block component, the extension suggests available slot names.
+
+Slot names are resolved from multiple sources:
+
+1. **Component metadata** — When `mdc.enableComponentMetadataCompletions` is enabled and metadata is available, slot names are read directly from the component's metadata.
+2. **Document discovery** — The extension scans the current document and other open MDC files for slot patterns (`#slotName`) used inside the same component.
+3. **Component source files** — The extension searches the workspace for matching Vue (`.vue`), Svelte (`.svelte`), React (`.tsx`/`.jsx`), and Angular (`.component.ts`/`.component.html`) component files and extracts slot definitions from them.
+
+Already-used slot names within the same component instance are automatically filtered out when metadata is available.
+
+This feature works without any configuration — slot discovery from documents and source files is always active.
 
 ### For more information
 
