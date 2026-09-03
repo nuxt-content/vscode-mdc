@@ -1,9 +1,9 @@
 {
   "name": "mdc",
-  "packageManager": "pnpm@11.2.2",
+  "packageManager": "pnpm@11.7.0",
   "displayName": "Comark - Components in Markdown (previously MDC)",
   "description": "Provides syntax highlighting and colon matching for Comark (Components in Markdown, previously MDC) files.",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "publisher": "Nuxt",
   "icon": "images/logo.png",
   "repository": {
@@ -218,22 +218,22 @@
     "publish": "vsce publish"
   },
   "devDependencies": {
-    "@nuxt/schema": "^4.4.2",
+    "@nuxt/schema": "^4.4.8",
     "@types/glob": "^9.0.0",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^25.6.0",
+    "@types/node": "^25.9.3",
     "@types/vscode": "1.42.0",
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^2.32.0",
     "esno": "^4.8.0",
     "glob": "^13.0.6",
-    "mocha": "^11.7.5",
-    "oxlint": "^1.62.0",
-    "release-it": "^20.0.1",
+    "mocha": "^11.7.6",
+    "oxlint": "^1.70.0",
+    "release-it": "^20.2.0",
     "typescript": "6.0.3",
-    "vitest": "^4.1.5",
+    "vitest": "^4.1.9",
     "vscode-textmate": "^9.3.2",
-    "vue-component-meta": "^3.2.7"
+    "vue-component-meta": "^3.3.5"
   },
   "dependencies": {
     "@nuxtlabs/monarch-mdc": "^0.9.0",
